@@ -2688,9 +2688,9 @@ void process_commands()
          break;
     #endif
     #ifdef FWRETRACT
-    case 207: //M207 - set retract length S[positive mm] F[feedrate mm/sec] Z[additional zlift/hop]
+    case 207: //M207 - set retract length S[positive mm] F[feedrate mm/min] Z[additional zlift/hop]
     {
-      if(code_seen('S'))
+      if(code_seen('E'))
       {
         retract_length = code_value() ;
       }
@@ -2702,10 +2702,18 @@ void process_commands()
       {
         retract_zlift = code_value() ;
       }
+      SERIAL_PROTOCOLPGM("retract_length:");
+      SERIAL_PROTOCOL(retract_length);
+      SERIAL_PROTOCOLPGM("mm retract_feedrate:");
+      SERIAL_PROTOCOL(retract_feedrate);
+      SERIAL_PROTOCOLPGM("mm/min retract_zlift:");
+      SERIAL_PROTOCOL(retract_zlift);
+      SERIAL_PROTOCOLPGM("mm\n");
+
     }break;
-    case 208: // M208 - set retract recover length S[positive mm surplus to the M207 S*] F[feedrate mm/sec]
+    case 208: // M208 - set retract recover length S[positive mm surplus to the M207 S*] F[feedrate mm/min]
     {
-      if(code_seen('S'))
+      if(code_seen('E'))
       {
         retract_recover_length = code_value() ;
       }
@@ -2713,6 +2721,11 @@ void process_commands()
       {
         retract_recover_feedrate = code_value() ;
       }
+      SERIAL_PROTOCOLPGM("retract_recover_length:");
+      SERIAL_PROTOCOL(retract_recover_length);
+      SERIAL_PROTOCOLPGM("mm rectract_recover_feedrate:");
+      SERIAL_PROTOCOL(retract_recover_feedrate);
+      SERIAL_PROTOCOLPGM(" mm/min\n");
     }break;
     case 209: // M209 - S<1=true/0=false> enable automatic retract detect if the slicer did not support G10/11: every normal extrude-only move will be classified as retract depending on the direction.
     {
@@ -2877,7 +2890,7 @@ void process_commands()
 
         updatePID();
         SERIAL_PROTOCOL(MSG_OK);
-        SERIAL_PROTOCOL(" p:");
+        SERIAL_PROTOCOL("\np:");
         SERIAL_PROTOCOL(bedKp);
         SERIAL_PROTOCOL(" i:");
         SERIAL_PROTOCOL(unscalePID_i(bedKi));
@@ -3426,15 +3439,15 @@ void clamp_to_software_endstops(float target[3])
 void calculate_delta(float cartesian[3]) 
 {
   delta[X_AXIS] = sqrt(DELTA_DIAGONAL_ROD_2
-                       - sq(delta_tower1_x-cartesian[X_AXIS])
+                       - sq(delta_tower1_x+cartesian[X_AXIS])
                        - sq(delta_tower1_y-cartesian[Y_AXIS])
                        ) + cartesian[Z_AXIS];
   delta[Y_AXIS] = sqrt(DELTA_DIAGONAL_ROD_2
-                       - sq(delta_tower2_x-cartesian[X_AXIS])
+                       - sq(delta_tower2_x+cartesian[X_AXIS])
                        - sq(delta_tower2_y-cartesian[Y_AXIS])
                        ) + cartesian[Z_AXIS];
   delta[Z_AXIS] = sqrt(DELTA_DIAGONAL_ROD_2
-                       - sq(delta_tower3_x-cartesian[X_AXIS])
+                       - sq(delta_tower3_x+cartesian[X_AXIS])
                        - sq(delta_tower3_y-cartesian[Y_AXIS])
                        ) + cartesian[Z_AXIS];
                        
