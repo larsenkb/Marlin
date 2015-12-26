@@ -1978,7 +1978,14 @@ void process_commands()
          */  
           } 
          
-  	retract_z_probe();
+  	    retract_z_probe();
+        destination[X_AXIS] = 0;
+        destination[Y_AXIS] = 0;
+        prepare_move_raw();
+        st_synchronize();
+
+        // center carriage
+
  
         //Restore saved variables
         feedrate = saved_feedrate;
@@ -2678,9 +2685,11 @@ void process_commands()
              SERIAL_ECHOLN("");
              SERIAL_ECHOPAIR("K (Tower C Radius Correction): ",tower_adj[5]);
 	     SERIAL_ECHOLN("");
-             SERIAL_ECHOPAIR("R (Delta Radius): ",delta_radius);
+             SERIAL_ECHO("R (Delta Radius): ");
+             SERIAL_PROTOCOL_F(delta_radius, 4);
              SERIAL_ECHOLN("");
-             SERIAL_ECHOPAIR("D (Diagonal Rod Length): ",delta_diagonal_rod);
+             SERIAL_ECHO("D (Diagonal Rod Length): ");
+             SERIAL_PROTOCOL_F(delta_diagonal_rod, 4);
 	     SERIAL_ECHOLN("");
              SERIAL_ECHOPAIR("H (Z-Height): ",max_pos[Z_AXIS]);
              SERIAL_ECHOLN("");
